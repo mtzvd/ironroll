@@ -1,5 +1,7 @@
 # ironroll
 
+[![Build and Deploy](https://github.com/mtzvd/ironroll/actions/workflows/deploy.yml/badge.svg)](https://github.com/mtzvd/ironroll/actions/workflows/deploy.yml)
+
 Dice roller for [Ironsworn](https://www.ironswornrpg.com/) tabletop RPG. Supports Telegram inline bot, Discord slash command, and HTTP API.
 
 ## Ironsworn Dice Mechanic
