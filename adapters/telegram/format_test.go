@@ -18,18 +18,15 @@ func TestFormatResultContainsFields(t *testing.T) {
 
 	s := formatResult(r)
 
+	// formatResult returns compact format: 🎲 (action +mod) vs (c1 & c2) → Outcome
 	checks := []string{
-		"Action Die",
-		"Modifier",
-		"Challenge Dice",
-		"Total",
-		"Outcome",
-		"4",
-		"-1",
-		"7",
-		"2",
-		"3",
-		"Failure",
+		"🎲",
+		"4",   // action die
+		"-1",  // modifier
+		"7",   // challenge die 1
+		"2",   // challenge die 2
+		"vs",
+		"Miss", // outcome (Failure maps to Miss)
 	}
 
 	for _, c := range checks {

@@ -43,6 +43,12 @@ func HandleInlineQuery(bot *tgbotapi.BotAPI, query *tgbotapi.InlineQuery) {
 		return
 	}
 
+	// Safety check for nil bot (can happen in tests).
+	if bot == nil {
+		slog.Warn("telegram bot is nil, skipping response")
+		return
+	}
+
 	modifier := parseModifier(query.Query)
 
 	// Perform the roll during InlineQuery handling
