@@ -82,7 +82,7 @@ jobs:
               echo "Starting ironroll directly (no systemd service)"
               nohup ./ironroll > /opt/ironroll/ironroll.log 2>&1 &
               sleep 2
-              if pgrep -f "/opt/ironroll/ironroll" > /dev/null; then
+              if pgrep -f "ironroll" > /dev/null; then
                 echo "ironroll started successfully"
               else
                 echo "Failed to start ironroll, check logs:"
