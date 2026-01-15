@@ -82,7 +82,7 @@ func main() {
 
 	go func() {
 		slog.Info("http api started", "port", port)
-		if err := http.ListenAndServe(":"+port, nil); err != nil {
+		if err := http.ListenAndServe("127.0.0.1:"+port, nil); err != nil {
 			slog.Error("http server failed", "err", err)
 			os.Exit(1)
 		}
