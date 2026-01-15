@@ -4,22 +4,11 @@ After=network.target
 
 [Service]
 Type=simple
-User=ironroll
-Group=ironroll
 WorkingDirectory=/opt/ironroll
 ExecStart=/opt/ironroll/ironroll
 Restart=always
 RestartSec=5
-
-# Environment variables
 EnvironmentFile=/opt/ironroll/.env
-
-# Security hardening
-NoNewPrivileges=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=/opt/ironroll
-PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target

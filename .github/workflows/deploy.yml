@@ -64,30 +64,13 @@ jobs:
             cd /opt/ironroll
             chmod +x ironroll.new
 
-            # Stop old process (systemd or direct)
-            if systemctl is-active --quiet ironroll 2>/dev/null; then
-              sudo systemctl stop ironroll
-            else
-              pkill -f "ironroll" || true
-              sleep 1
-            fi
+            # Stop service
+            systemctl stop ironroll 2>/dev/null || pkill -f "ironroll" || true
+            sleep 1
 
             mv ironroll.new ironroll
 
-            # Start service (systemd if available, otherwise direct)
-            if systemctl list-unit-files | grep -q ironroll.service; then
-              sudo systemctl start ironroll
-              sudo systemctl status ironroll --no-pager
-            else
-              echo "Starting ironroll directly (no systemd service)"
-              nohup ./ironroll > /opt/ironroll/ironroll.log 2>&1 &
-              sleep 2
-              if pgrep -f "ironroll" > /dev/null; then
-                echo "ironroll started successfully"
-              else
-                echo "Failed to start ironroll, check logs:"
-                tail -20 /opt/ironroll/ironroll.log
-                exit 1
-              fi
-            fi
+            # Start with systemd
+            systemctl start ironroll
+            systemctl status ironroll --no-pager
           ENDSSH
