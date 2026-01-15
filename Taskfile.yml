@@ -1,0 +1,43 @@
+version: '3'
+
+tasks:
+  tidy:
+    desc: "Run go mod tidy"
+    cmds:
+      - go mod tidy
+
+  fmt:
+    desc: "Format Go files"
+    cmds:
+      - gofmt -w .
+
+  vet:
+    desc: "Run go vet on packages"
+    cmds:
+      - go vet ./...
+
+  build:
+    desc: "Build all packages"
+    cmds:
+      - go build ./...
+
+  run:
+    desc: "Run the main package"
+    cmds:
+      - go run ./cmd/ironroll
+
+  test:
+    desc: "Run tests"
+    cmds:
+      - go test ./...
+
+  dump:
+    desc: "Run dump.ps1"
+    cmds:
+      - pwsh -File dump.ps1
+
+  init:
+    desc: "Project initialization helper"
+    cmds:
+      - go mod tidy
+      - gofmt -w .

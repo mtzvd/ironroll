@@ -1,0 +1,48 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Vendor directory
+/vendor/
+
+# Dependency directories
+Godeps/
+
+# Build output
+/bin/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Environment
+.env
+
+# Claude Code
+.claude/
+
+# Terraform
+.terraform/
+
+# Go workspace file
+*.mod.cache
+
+# Coverage outputs
+coverage
+coverage.out
+coverage.html
