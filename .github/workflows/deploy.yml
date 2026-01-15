@@ -1,0 +1,70 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  BINARY_NAME: ironroll
+  DEPLOY_PATH: /opt/ironroll
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Build binary for Linux
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ${{ env.BINARY_NAME }} ./cmd/ironroll
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary
+          path: ${{ env.BINARY_NAME }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: binary
+
+      - name: Deploy to VPS
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+        run: |
+          # Setup SSH
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${VPS_PORT} ${VPS_HOST} >> ~/.ssh/known_hosts
+
+          # Upload binary
+          scp -P ${VPS_PORT} ${{ env.BINARY_NAME }} ${VPS_USER}@${VPS_HOST}:${{ env.DEPLOY_PATH }}/${{ env.BINARY_NAME }}.new
+
+          # Deploy with zero-downtime
+          ssh -p ${VPS_PORT} ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
+            cd /opt/ironroll
+            chmod +x ironroll.new
+            sudo systemctl stop ironroll || true
+            mv ironroll.new ironroll
+            sudo systemctl start ironroll
+            sudo systemctl status ironroll --no-pager
+          ENDSSH
