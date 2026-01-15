@@ -59,12 +59,28 @@ jobs:
           # Upload binary
           scp -P ${VPS_PORT} ${{ env.BINARY_NAME }} ${VPS_USER}@${VPS_HOST}:${{ env.DEPLOY_PATH }}/${{ env.BINARY_NAME }}.new
 
-          # Deploy with zero-downtime
+          # Deploy and restart service
           ssh -p ${VPS_PORT} ${VPS_USER}@${VPS_HOST} << 'ENDSSH'
             cd /opt/ironroll
             chmod +x ironroll.new
-            sudo systemctl stop ironroll || true
+
+            # Stop old process (systemd or direct)
+            if systemctl is-active --quiet ironroll 2>/dev/null; then
+              sudo systemctl stop ironroll
+            elif pgrep -f "/opt/ironroll/ironroll" > /dev/null; then
+              pkill -f "/opt/ironroll/ironroll" || true
+            fi
+
             mv ironroll.new ironroll
-            sudo systemctl start ironroll
-            sudo systemctl status ironroll --no-pager
+
+            # Start service (systemd if available, otherwise direct)
+            if systemctl list-unit-files | grep -q ironroll.service; then
+              sudo systemctl start ironroll
+              sudo systemctl status ironroll --no-pager
+            else
+              echo "Starting ironroll directly (no systemd service)"
+              nohup ./ironroll > /opt/ironroll/ironroll.log 2>&1 &
+              sleep 2
+              pgrep -f "/opt/ironroll/ironroll" && echo "ironroll started successfully"
+            fi
           ENDSSH
