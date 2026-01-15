@@ -67,8 +67,9 @@ jobs:
             # Stop old process (systemd or direct)
             if systemctl is-active --quiet ironroll 2>/dev/null; then
               sudo systemctl stop ironroll
-            elif pgrep -f "/opt/ironroll/ironroll" > /dev/null; then
-              pkill -f "/opt/ironroll/ironroll" || true
+            else
+              pkill -f "ironroll" || true
+              sleep 1
             fi
 
             mv ironroll.new ironroll
